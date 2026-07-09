@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useClass } from './context/ClassContext';
 import { ClassProvider } from './context/ClassContext';
 import Dashboard from './components/Dashboard';
 import StudentList from './components/StudentList';
@@ -18,6 +19,7 @@ import {
 
 function AppContent() {
   const [activeTab, setActiveTab] = useState('dashboard');
+  const { loading, error } = useClass();
 
   const tabs = [
     { id: 'dashboard', label: 'แดชบอร์ด', icon: LayoutDashboard, component: Dashboard },
@@ -88,9 +90,24 @@ function AppContent() {
 
       {/* Main Content Area */}
       <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 relative">
-        <div className="animate-fade-in">
-          <ActiveComponent />
-        </div>
+        {loading ? (
+          <div className="flex flex-col items-center justify-center min-h-[60vh] gap-4">
+            <div className="w-10 h-10 border-4 border-violet-600 border-t-transparent rounded-full animate-spin" />
+            <p className="text-sm text-gray-400 font-medium">กำลังโหลดข้อมูลจาก Supabase...</p>
+          </div>
+        ) : error ? (
+          <div className="flex flex-col items-center justify-center min-h-[60vh] gap-3 text-center">
+            <div className="p-4 rounded-2xl bg-rose-500/10 border border-rose-500/20">
+              <p className="text-rose-400 font-semibold text-sm">❌ ไม่สามารถเชื่อมต่อฐานข้อมูลได้</p>
+              <p className="text-xs text-gray-400 mt-1 max-w-sm">{error}</p>
+              <p className="text-xs text-gray-500 mt-2">กรุณาตรวจสอบค่า VITE_SUPABASE_URL และ VITE_SUPABASE_ANON_KEY ในไฟล์ .env</p>
+            </div>
+          </div>
+        ) : (
+          <div className="animate-fade-in">
+            <ActiveComponent />
+          </div>
+        )}
       </main>
 
       {/* Footer */}
